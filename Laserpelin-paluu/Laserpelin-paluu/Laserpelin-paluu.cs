@@ -9,8 +9,9 @@ namespace Laserpelin_paluu;
 
 public class Laserpelin_paluu : PhysicsGame
 {
-    PhysicsObject torni;
+    Cannon torni;
     PhysicsObject piippu;
+    PhysicsObject pahis;
     public override void Begin()
     {
 
@@ -19,9 +20,8 @@ public class Laserpelin_paluu : PhysicsGame
         pelaa();
         
         
-
-        PhoneBackButton.Listen(ConfirmExit, "Lopeta peli");
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
+        Mouse.Listen(MouseButton.Left, ButtonState.Down, AmmuAseella, "Lopeta peli", torni);
 
 
         
@@ -38,35 +38,75 @@ public class Laserpelin_paluu : PhysicsGame
         
     void luotorni()
     {
-        torni = new PhysicsObject(100, 100);
-        torni.IgnoresCollisionResponse = true;
-        torni.Shape = Shape.Circle;
-        torni.Color = Color.Gray;
-        torni.X = (0.0);
-        torni.Y = (-300.0);
-        
+        torni = new Cannon(100, 100);
+        torni.X = (0.0); 
+        torni.Y = (300.0);
+        torni.IsVisible = false;
+        torni.Power.DefaultValue = 50000;
+        torni.FireRate = 1.0;
+        torni.AmmoIgnoresGravity = false;
+
+
         Add(torni);
-            
-        piippu = new PhysicsObject(125, 40);
+
+        PhysicsObject body = new PhysicsObject(100, 100);
+        body.IgnoresCollisionResponse = true;
+        body.Shape = Shape.Circle;
+        body.Color = Color.Gray;
+        body.X = (0.0); 
+        body.Y = (300.0);
+        
+        torni.Add(body);
+
+        piippu = new PhysicsObject(75, 40);
         piippu.IgnoresCollisionResponse = true;
         piippu.Shape = Shape.Rectangle;
         piippu.Color = Color.Gold;
-        piippu.X = (0.0);
-        piippu.Y = (-300.0);
+        piippu.Position = torni.Position + new Vector(25.0, 0.0);
 
-        Add(piippu);
+        torni.Add(piippu);
+        
+        pahis = new PhysicsObject(100, 100);
+        pahis.Shape = Shape.Triangle;
+        pahis.Color = Color.Blue;
+        pahis.X = (0.0);
+        pahis.Y = (-300.0);
+        FollowerBrain seuraajanAivot = new FollowerBrain(body);
+        pahis.Brain = seuraajanAivot;
+        seuraajanAivot.Speed = 9000;
+        seuraajanAivot.DistanceFar = 1000; 
+        seuraajanAivot.DistanceClose = 0;
+        seuraajanAivot.StopWhenTargetClose = false;
+
+        Add(pahis);
+        
+
+    }
+    
+    void AmmuAseella(Cannon cannon)
+    {
+        PhysicsObject ammus = cannon.Shoot();
+        
+        if(ammus != null)
+        {
+            ammus.Size *= 7;
+            //ammus.Image = ...
+            //ammus.MaximumLifetime = TimeSpan.FromSeconds(2.0);
+        }
     }
 
     void pelaa()
     {
         Mouse.ListenMovement(0.1, Tahtaa, "Tähtää aseella");
-        
+        Gravity = new Vector(0.0, -10.0);
+
     }
-        
+    
+    
     void Tahtaa()
     {
         Vector suunta = (Mouse.PositionOnWorld - piippu.AbsolutePosition).Normalize();
-        piippu.Angle = suunta.Angle;
+        torni.Angle = suunta.Angle;
     }
     
 }

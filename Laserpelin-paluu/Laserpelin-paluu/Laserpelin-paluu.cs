@@ -33,6 +33,10 @@ public class Laserpelin_paluu : PhysicsGame
         Level.Background.Color = Color.Black;
         Level.CreateBorders(1.0, false);
         Camera.ZoomToLevel();
+        Timer ajastin = new Timer();
+        ajastin.Interval = 1.5;
+        ajastin.Timeout += luopahis;
+        ajastin.Start();
     }
         
         
@@ -43,7 +47,7 @@ public class Laserpelin_paluu : PhysicsGame
         torni.Y = (300.0);
         torni.IsVisible = false;
         torni.Power.DefaultValue = 50000;
-        torni.FireRate = 1.0;
+        torni.FireRate = 2.0;
         torni.AmmoIgnoresGravity = false;
 
 
@@ -66,42 +70,51 @@ public class Laserpelin_paluu : PhysicsGame
 
         torni.Add(piippu);
         
-        pahis = new PhysicsObject(100, 100);
-        pahis.Shape = Shape.Triangle;
-        pahis.Color = Color.Blue;
-        pahis.X = (0.0);
-        pahis.Y = (-300.0);
-        FollowerBrain seuraajanAivot = new FollowerBrain(body);
-        pahis.Brain = seuraajanAivot;
-        seuraajanAivot.Speed = 9000;
-        seuraajanAivot.DistanceFar = 1000; 
-        seuraajanAivot.DistanceClose = 0;
-        seuraajanAivot.StopWhenTargetClose = false;
-
-        Add(pahis);
         
 
     }
-    
+
+    private void luopahis()
+    {
+        FollowerBrain seuraajanAivot = new FollowerBrain(torni);
+        seuraajanAivot.Speed = 25;
+        seuraajanAivot.DistanceFar = 100000; 
+        seuraajanAivot.DistanceClose = 0;
+        seuraajanAivot.StopWhenTargetClose = false;
+            
+        pahis = new PhysicsObject(100, 100);
+        pahis.Shape = Shape.Triangle;
+        pahis.Color = Color.Blue;
+        pahis.Y = (-400.0);
+        //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
+        pahis.IgnoresGravity = true;
+        pahis.X = (RandomGen.NextDouble(-200, 200));
+        Add(pahis);
+        pahis.Brain = seuraajanAivot;
+        pahis.Brain.Active = true;
+    }
+
     void AmmuAseella(Cannon cannon)
     {
         PhysicsObject ammus = cannon.Shoot();
         
         if(ammus != null)
         {
-            ammus.Size *= 7;
+            ammus.Size *= 10;
             //ammus.Image = ...
-            //ammus.MaximumLifetime = TimeSpan.FromSeconds(2.0);
+            ammus.MaximumLifetime = TimeSpan.FromSeconds(20.0);
         }
     }
 
     void pelaa()
     {
         Mouse.ListenMovement(0.1, Tahtaa, "Tähtää aseella");
-        Gravity = new Vector(0.0, -10.0);
-
+        Gravity = new Vector(0.0, -1000.0);
     }
-    
+    void AmmusOsui(PhysicsObject ammus, PhysicsObject kohde)
+    {
+        ammus.Destroy();
+    }
     
     void Tahtaa()
     {

@@ -12,6 +12,10 @@ public class Laserpelin_paluu : PhysicsGame
     Cannon torni;
     PhysicsObject piippu;
     PhysicsObject pahis;
+    PhysicsObject seinä;
+    PhysicsObject seinä2;
+    Image pahiskuva = LoadImage("dorito-tyhja");
+    Image seinäkuva = LoadImage("seina-tyhja");
     public override void Begin()
     {
 
@@ -20,8 +24,10 @@ public class Laserpelin_paluu : PhysicsGame
         pelaa();
         
         
+        
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
         Mouse.Listen(MouseButton.Left, ButtonState.Down, AmmuAseella, "Lopeta peli", torni);
+        //torni.ProjectileCollision = AmmusOsui;
 
 
         
@@ -34,7 +40,7 @@ public class Laserpelin_paluu : PhysicsGame
         Level.CreateBorders(1.0, false);
         Camera.ZoomToLevel();
         Timer ajastin = new Timer();
-        ajastin.Interval = 1.5;
+        ajastin.Interval = 3;
         ajastin.Timeout += luopahis;
         ajastin.Start();
     }
@@ -47,9 +53,8 @@ public class Laserpelin_paluu : PhysicsGame
         torni.Y = (300.0);
         torni.IsVisible = false;
         torni.Power.DefaultValue = 50000;
-        torni.FireRate = 2.0;
+        torni.FireRate = 1.0;
         torni.AmmoIgnoresGravity = false;
-
 
         Add(torni);
 
@@ -69,29 +74,42 @@ public class Laserpelin_paluu : PhysicsGame
         piippu.Position = torni.Position + new Vector(25.0, 0.0);
 
         torni.Add(piippu);
-        
-        
+
+        seinä = new PhysicsObject(300, 50);
+        seinä2 = new PhysicsObject(300, 50);
+        seinä.X = (-200);
+        seinä.Y = (0);
+        seinä.Image = seinäkuva;
+        Add(seinä);
+        seinä2.X = (200);
+        seinä2.Y = (0);
+        seinä2.Image = seinäkuva;
+        Add(seinä2);
 
     }
 
     private void luopahis()
     {
+        
+        
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
-        seuraajanAivot.Speed = 25;
+        seuraajanAivot.Speed = 40;
         seuraajanAivot.DistanceFar = 100000; 
         seuraajanAivot.DistanceClose = 0;
         seuraajanAivot.StopWhenTargetClose = false;
             
         pahis = new PhysicsObject(100, 100);
         pahis.Shape = Shape.Triangle;
-        pahis.Color = Color.Blue;
+        pahis.Color = RandomGen.NextColor();
+        pahis.Image = pahiskuva;
         pahis.Y = (-400.0);
         //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
-        pahis.IgnoresGravity = true;
-        pahis.X = (RandomGen.NextDouble(-200, 200));
+        pahis.IgnoresGravity = false;
+        pahis.X = (RandomGen.NextDouble(-400, 400));
         Add(pahis);
         pahis.Brain = seuraajanAivot;
         pahis.Brain.Active = true;
+        
     }
 
     void AmmuAseella(Cannon cannon)
@@ -100,9 +118,9 @@ public class Laserpelin_paluu : PhysicsGame
         
         if(ammus != null)
         {
-            ammus.Size *= 10;
+            ammus.Size *= 7;
             //ammus.Image = ...
-            ammus.MaximumLifetime = TimeSpan.FromSeconds(20.0);
+            //ammus.MaximumLifetime = TimeSpan.FromSeconds(20.0);
         }
     }
 

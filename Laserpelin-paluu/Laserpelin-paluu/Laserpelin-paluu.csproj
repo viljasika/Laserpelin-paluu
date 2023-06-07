@@ -8,8 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Jypeli.NET" Version="11.*"/>
-        <PackageReference Include="Jypeli.FarseerPhysics.NET" Version="2.*"/>
+        <PackageReference Include="Jypeli.NET" Version="11.*" />
+        <PackageReference Include="Jypeli.FarseerPhysics.NET" Version="2.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Content\dorito-tyhja.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

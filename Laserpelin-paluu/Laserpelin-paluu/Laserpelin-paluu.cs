@@ -15,7 +15,7 @@ public class Laserpelin_paluu : PhysicsGame
     PhysicsObject seinä;
     PhysicsObject seinä2;
     Image pahiskuva = LoadImage("dorito-tyhja");
-    Image seinäkuva = LoadImage("seina-tyhja");
+    Image seinäkuva = LoadImage("Seina-tyhja");
     public override void Begin()
     {
 
@@ -75,12 +75,14 @@ public class Laserpelin_paluu : PhysicsGame
 
         torni.Add(piippu);
 
-        seinä = new PhysicsObject(300, 50);
-        seinä2 = new PhysicsObject(300, 50);
+        seinä = new PhysicsObject(400, 100);
+        seinä2 = new PhysicsObject(400, 100);
         seinä.X = (-200);
         seinä.Y = (0);
         seinä.Image = seinäkuva;
+        seinä.Mass = 3;
         Add(seinä);
+        seinä2.Mass = 3;
         seinä2.X = (200);
         seinä2.Y = (0);
         seinä2.Image = seinäkuva;
@@ -93,7 +95,7 @@ public class Laserpelin_paluu : PhysicsGame
         
         
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
-        seuraajanAivot.Speed = 40;
+        seuraajanAivot.Speed = 80;
         seuraajanAivot.DistanceFar = 100000; 
         seuraajanAivot.DistanceClose = 0;
         seuraajanAivot.StopWhenTargetClose = false;
@@ -103,6 +105,7 @@ public class Laserpelin_paluu : PhysicsGame
         pahis.Color = RandomGen.NextColor();
         pahis.Image = pahiskuva;
         pahis.Y = (-400.0);
+        pahis.Mass = 1;
         //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
         pahis.IgnoresGravity = false;
         pahis.X = (RandomGen.NextDouble(-400, 400));

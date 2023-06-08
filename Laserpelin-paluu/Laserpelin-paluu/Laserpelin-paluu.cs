@@ -17,6 +17,9 @@ public class Laserpelin_paluu : PhysicsGame
     PhysicsObject seinä2;
     PhysicsObject body;
     PhysicsObject nelio;
+    PhysicsObject pallo;
+    PhysicsObject juusto;
+    PhysicsObject soikio;
     int pMaxMaara = 200;
     Image rajahdyskuva = LoadImage("rajahdysp");
     List<Label> valikonKohdat;
@@ -25,6 +28,8 @@ public class Laserpelin_paluu : PhysicsGame
     Image pahiskuva = LoadImage("dorito-tyhja");
     Image neliokuva = LoadImage("pringles");
     Image seinäkuva = LoadImage("Seina-tyhja");
+    Image pallokuva = LoadImage("pahkina");
+    Image soikiokuva = LoadImage("taffel");
     public override void Begin()
     {
         //MultiSelectWindow alkuvalikko = new MultiSelectWindow("LaserPelin Paluu!", "Aloita peli", "Lopeta");
@@ -84,6 +89,7 @@ public class Laserpelin_paluu : PhysicsGame
         torni.Power.DefaultValue = 50000;
         torni.FireRate = 1.0;
         torni.AmmoIgnoresGravity = false;
+        torni.ProjectileCollision += AmmusOsui;
 
         Add(torni);
 
@@ -109,9 +115,9 @@ public class Laserpelin_paluu : PhysicsGame
         seinä.X = (-225);
         seinä.Y = (0);
         seinä.Image = seinäkuva;
-        seinä.Mass = 5;
+        seinä.Mass = 6;
         Add(seinä);
-        seinä2.Mass = 5;
+        seinä2.Mass = 6;
         seinä2.X = (225);
         seinä2.Y = (0);
         seinä2.Image = seinäkuva;
@@ -122,15 +128,34 @@ public class Laserpelin_paluu : PhysicsGame
     private void luopahis()
     {
         pistelaskuri.AddValue(1);
-
+        
+        if (RandomGen.NextInt(1, 7) == 1)
+        {
+            Juusto();
+        }
+        
+        if (pistelaskuri == 10)
+        {
+            bossi();
+        }
         if (pistelaskuri == 15)
         {
-            Pringles();
+            bossi();
+        }
+        if (pistelaskuri == 20)
+        {
+            bossi();
+        }
+        if (pistelaskuri == 25)
+        {
+            bossi();
         }
         if (pistelaskuri == 30)
         {
-            Pringles();
+            bossi();
         }
+
+
         
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
         seuraajanAivot.Speed = 80;
@@ -151,7 +176,7 @@ public class Laserpelin_paluu : PhysicsGame
         Add(pahis);
         pahis.Brain = seuraajanAivot;
         pahis.Brain.Active = true;
-        
+
     }
 
     void AmmuAseella(Cannon cannon)
@@ -173,7 +198,10 @@ public class Laserpelin_paluu : PhysicsGame
     }
     void AmmusOsui(PhysicsObject ammus, PhysicsObject kohde)
     {
-        ammus.Destroy();
+        if (kohde.Tag == "tuho")
+        {
+            ammus.Destroy();
+        }
     }
     
     void Tahtaa()
@@ -226,14 +254,14 @@ public class Laserpelin_paluu : PhysicsGame
     void Pringles()
     {
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
-        seuraajanAivot.Speed = 80;
+        seuraajanAivot.Speed = 40;
         seuraajanAivot.DistanceFar = 100000; 
         seuraajanAivot.DistanceClose = 100;
         seuraajanAivot.StopWhenTargetClose = true;
         seuraajanAivot.TargetClose += PahisOsuu;
             
         nelio = new PhysicsObject(175, 175);
-        nelio.Shape = Shape.Rectangle;
+        nelio.Shape = Shape.Circle;
         nelio.Image = neliokuva;
         nelio.Y = (-400.0);
         nelio.Mass = 20;
@@ -244,5 +272,101 @@ public class Laserpelin_paluu : PhysicsGame
         nelio.Brain = seuraajanAivot;
         nelio.Brain.Active = true;
     }
-    
+    void Pahkina()
+    {
+        FollowerBrain seuraajanAivot = new FollowerBrain(torni);
+        seuraajanAivot.Speed = 130;
+        seuraajanAivot.DistanceFar = 100000; 
+        seuraajanAivot.DistanceClose = 50;
+        seuraajanAivot.StopWhenTargetClose = true;
+        seuraajanAivot.TargetClose += PahisOsuu;
+            
+        pallo = new PhysicsObject(50, 50);
+        pallo.Shape = Shape.Rectangle;
+        pallo.Image = pallokuva;
+        pallo.Y = (-400.0);
+        pallo.Mass = 1;
+        //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
+        pallo.IgnoresGravity = false;
+        pallo.X = (RandomGen.NextDouble(-400, 400));
+        Add(pallo);
+        pallo.Brain = seuraajanAivot;
+        pallo.Brain.Active = true;
+    }
+
+    void bossi()
+    {
+        int luku = RandomGen.NextInt(1, 5);
+        if (luku == 1)
+        {
+            Pringles();
+        }
+        
+        if (luku == 2)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                Pahkina();
+            }
+            
+        }
+        if (luku == 3)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Juusto();
+            }
+            
+        }
+        if (luku == 4)
+        {
+            Taffel();
+        }
+        
+    }
+
+    void Juusto()
+    {
+        juusto = new PhysicsObject(50, 50);
+        juusto.Shape = Shape.Circle;
+        juusto.Color = Color.Red;
+        juusto.Y = (400.0);
+        juusto.Mass = 1;
+        juusto.Tag = "tuho";
+        //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
+        juusto.IgnoresGravity = false;
+        juusto.X = (RandomGen.NextDouble(-400, 400));
+        juusto.IgnoresCollisionResponse = true;
+        Add(juusto);
+    }
+    void Taffel()
+    {
+        FollowerBrain seuraajanAivot = new FollowerBrain(torni);
+        seuraajanAivot.Speed = 40;
+        seuraajanAivot.DistanceFar = 100000; 
+        seuraajanAivot.DistanceClose = 100;
+        seuraajanAivot.StopWhenTargetClose = true;
+        seuraajanAivot.TargetClose += PahisOsuu;
+            
+        soikio = new PhysicsObject(100, 200);
+        soikio.Shape = Shape.Circle;
+        soikio.Image = soikiokuva;
+        soikio.Y = (-400.0);
+        soikio.Mass = 1;
+        //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
+        soikio.IgnoresGravity = false;
+        soikio.X = (RandomGen.NextDouble(-400, 400));
+        Add(soikio);
+        soikio.Brain = seuraajanAivot;
+        soikio.Brain.Active = true;
+        soikio.AngularVelocity = 20;
+        AddCollisionHandler(soikio, TaffelTormaa);
+    }
+
+    void TaffelTormaa(PhysicsObject tormaaja, PhysicsObject kohde)
+    {
+        
+        tormaaja.AngularVelocity = 20;
+    }
+
 }

@@ -19,6 +19,7 @@ public class Laserpelin_paluu : PhysicsGame
     int pMaxMaara = 200;
     Image rajahdyskuva = LoadImage("rajahdysp");
     List<Label> valikonKohdat;
+    IntMeter pistelaskuri;
     
     Image pahiskuva = LoadImage("dorito-tyhja");
     Image seinäkuva = LoadImage("Seina-tyhja");
@@ -52,6 +53,7 @@ public class Laserpelin_paluu : PhysicsGame
         luokenttä();
         luotorni();
         pelaa();
+        LuoPistelaskuri();
         
 
         
@@ -117,7 +119,7 @@ public class Laserpelin_paluu : PhysicsGame
 
     private void luopahis()
     {
-        
+        pistelaskuri.AddValue(1);
         
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
         seuraajanAivot.Speed = 80;
@@ -185,7 +187,7 @@ public class Laserpelin_paluu : PhysicsGame
         // "Käynnistetään" räjähdys
         rajahdys.AddEffect(x, y, pMaara);
         
-        Timer.SingleShot(1, havio);
+        Timer.SingleShot(2, havio);
         
 
     }
@@ -195,6 +197,19 @@ public class Laserpelin_paluu : PhysicsGame
         ClearAll();
         valikko();
 
+    }
+    void LuoPistelaskuri()
+    {
+        pistelaskuri = new IntMeter(0);               
+      
+        Label pistenaytto = new Label(); 
+        pistenaytto.X = Screen.Left + 100;
+        pistenaytto.Y = Screen.Top - 50;
+        pistenaytto.TextColor = Color.Black;
+        pistenaytto.Color = Color.White;
+
+        pistenaytto.BindTo(pistelaskuri);
+        Add(pistenaytto);
     }
     
 }

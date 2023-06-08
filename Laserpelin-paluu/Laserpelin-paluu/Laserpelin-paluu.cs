@@ -16,12 +16,14 @@ public class Laserpelin_paluu : PhysicsGame
     PhysicsObject seinä;
     PhysicsObject seinä2;
     PhysicsObject body;
+    PhysicsObject nelio;
     int pMaxMaara = 200;
     Image rajahdyskuva = LoadImage("rajahdysp");
     List<Label> valikonKohdat;
     IntMeter pistelaskuri;
     
     Image pahiskuva = LoadImage("dorito-tyhja");
+    Image neliokuva = LoadImage("pringles");
     Image seinäkuva = LoadImage("Seina-tyhja");
     public override void Begin()
     {
@@ -102,15 +104,15 @@ public class Laserpelin_paluu : PhysicsGame
 
         torni.Add(piippu);
 
-        seinä = new PhysicsObject(400, 100);
-        seinä2 = new PhysicsObject(400, 100);
-        seinä.X = (-200);
+        seinä = new PhysicsObject(450, 100);
+        seinä2 = new PhysicsObject(450, 100);
+        seinä.X = (-225);
         seinä.Y = (0);
         seinä.Image = seinäkuva;
         seinä.Mass = 5;
         Add(seinä);
         seinä2.Mass = 5;
-        seinä2.X = (200);
+        seinä2.X = (225);
         seinä2.Y = (0);
         seinä2.Image = seinäkuva;
         Add(seinä2);
@@ -120,6 +122,15 @@ public class Laserpelin_paluu : PhysicsGame
     private void luopahis()
     {
         pistelaskuri.AddValue(1);
+
+        if (pistelaskuri == 15)
+        {
+            Pringles();
+        }
+        if (pistelaskuri == 30)
+        {
+            Pringles();
+        }
         
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
         seuraajanAivot.Speed = 80;
@@ -210,6 +221,28 @@ public class Laserpelin_paluu : PhysicsGame
 
         pistenaytto.BindTo(pistelaskuri);
         Add(pistenaytto);
+    }
+
+    void Pringles()
+    {
+        FollowerBrain seuraajanAivot = new FollowerBrain(torni);
+        seuraajanAivot.Speed = 80;
+        seuraajanAivot.DistanceFar = 100000; 
+        seuraajanAivot.DistanceClose = 100;
+        seuraajanAivot.StopWhenTargetClose = true;
+        seuraajanAivot.TargetClose += PahisOsuu;
+            
+        nelio = new PhysicsObject(175, 175);
+        nelio.Shape = Shape.Rectangle;
+        nelio.Image = neliokuva;
+        nelio.Y = (-400.0);
+        nelio.Mass = 20;
+        //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
+        nelio.IgnoresGravity = false;
+        nelio.X = (RandomGen.NextDouble(-400, 400));
+        Add(nelio);
+        nelio.Brain = seuraajanAivot;
+        nelio.Brain.Active = true;
     }
     
 }

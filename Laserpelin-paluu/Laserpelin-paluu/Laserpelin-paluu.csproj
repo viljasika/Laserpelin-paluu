@@ -19,6 +19,10 @@
       <None Update="Content\Seina-tyhja.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Remove="Content\rajahdys-p.png" />
+      <None Update="Content\rajahdysp.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

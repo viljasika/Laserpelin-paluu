@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Jypeli;
 using Jypeli.Assets;
+using Jypeli.Effects;
 using Jypeli.Controls;
 using Jypeli.Widgets;
 
@@ -14,24 +15,48 @@ public class Laserpelin_paluu : PhysicsGame
     PhysicsObject pahis;
     PhysicsObject seinä;
     PhysicsObject seinä2;
+    PhysicsObject body;
+    int pMaxMaara = 200;
+    Image rajahdyskuva = LoadImage("rajahdysp");
+    List<Label> valikonKohdat;
+    
     Image pahiskuva = LoadImage("dorito-tyhja");
     Image seinäkuva = LoadImage("Seina-tyhja");
     public override void Begin()
     {
+        //MultiSelectWindow alkuvalikko = new MultiSelectWindow("LaserPelin Paluu!", "Aloita peli", "Lopeta");
+        //Add(alkuvalikko);
+        //Mouse.ListenOn(, MouseButton.Left, ButtonState.Pressed, alkaa, null);
+        
 
+        
+        //torni.ProjectileCollision = AmmusOsui;
+
+        valikko();
+
+
+    }
+
+    void valikko()
+    {
+        MultiSelectWindow alkuvalikko = new MultiSelectWindow("LaserPelin Paluu!", "Aloita peli", "Lopeta");
+        Add(alkuvalikko);
+        
+        alkuvalikko.AddItemHandler(0, alkaa);
+        alkuvalikko.AddItemHandler(1, Exit);
+        
+    }
+
+    void alkaa()
+    {
         luokenttä();
         luotorni();
         pelaa();
         
-        
+
         
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
         Mouse.Listen(MouseButton.Left, ButtonState.Down, AmmuAseella, "Lopeta peli", torni);
-        //torni.ProjectileCollision = AmmusOsui;
-
-
-        
-        
     }
     
     void luokenttä()
@@ -80,9 +105,9 @@ public class Laserpelin_paluu : PhysicsGame
         seinä.X = (-200);
         seinä.Y = (0);
         seinä.Image = seinäkuva;
-        seinä.Mass = 3;
+        seinä.Mass = 5;
         Add(seinä);
-        seinä2.Mass = 3;
+        seinä2.Mass = 5;
         seinä2.X = (200);
         seinä2.Y = (0);
         seinä2.Image = seinäkuva;
@@ -97,8 +122,9 @@ public class Laserpelin_paluu : PhysicsGame
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
         seuraajanAivot.Speed = 80;
         seuraajanAivot.DistanceFar = 100000; 
-        seuraajanAivot.DistanceClose = 0;
-        seuraajanAivot.StopWhenTargetClose = false;
+        seuraajanAivot.DistanceClose = 100;
+        seuraajanAivot.StopWhenTargetClose = true;
+        seuraajanAivot.TargetClose += PahisOsuu;
             
         pahis = new PhysicsObject(100, 100);
         pahis.Shape = Shape.Triangle;
@@ -141,6 +167,34 @@ public class Laserpelin_paluu : PhysicsGame
     {
         Vector suunta = (Mouse.PositionOnWorld - piippu.AbsolutePosition).Normalize();
         torni.Angle = suunta.Angle;
+    }
+
+    void PahisOsuu()
+    {
+        ExplosionSystem rajahdys = new ExplosionSystem(rajahdyskuva, pMaxMaara);
+        rajahdys.MaxLifetime = 1;
+        rajahdys.MaxVelocity = 200;
+        rajahdys.MinLifetime = 0.5;
+        rajahdys.MinVelocity = 90;
+        
+        Add(rajahdys);
+
+        double x = 0;
+        double y = 300;
+        int pMaara = 50;
+        // "Käynnistetään" räjähdys
+        rajahdys.AddEffect(x, y, pMaara);
+        
+        Timer.SingleShot(1, havio);
+        
+
+    }
+
+    void havio()
+    {
+        ClearAll();
+        valikko();
+
     }
     
 }

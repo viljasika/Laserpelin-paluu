@@ -20,6 +20,7 @@ public class Laserpelin_paluu : PhysicsGame
     PhysicsObject pallo;
     PhysicsObject juusto;
     PhysicsObject soikio;
+    PhysicsObject mega;
     int pMaxMaara = 200;
     Image rajahdyskuva = LoadImage("rajahdysp");
     List<Label> valikonKohdat;
@@ -30,6 +31,7 @@ public class Laserpelin_paluu : PhysicsGame
     Image seinäkuva = LoadImage("Seina-tyhja");
     Image pallokuva = LoadImage("pahkina");
     Image soikiokuva = LoadImage("taffel");
+    Image megakuva = LoadImage("meganacho");
     public override void Begin()
     {
         //MultiSelectWindow alkuvalikko = new MultiSelectWindow("LaserPelin Paluu!", "Aloita peli", "Lopeta");
@@ -47,11 +49,12 @@ public class Laserpelin_paluu : PhysicsGame
 
     void valikko()
     {
-        MultiSelectWindow alkuvalikko = new MultiSelectWindow("LaserPelin Paluu!", "Aloita peli", "Lopeta");
+        MultiSelectWindow alkuvalikko = new MultiSelectWindow("LaserPelin Paluu!", "Aloita peli", "Lopeta", "Kaaos-pelimuoto");
         Add(alkuvalikko);
         
         alkuvalikko.AddItemHandler(0, alkaa);
         alkuvalikko.AddItemHandler(1, Exit);
+        alkuvalikko.AddItemHandler(2, kaaos);
         
     }
 
@@ -61,11 +64,14 @@ public class Laserpelin_paluu : PhysicsGame
         luotorni();
         pelaa();
         LuoPistelaskuri();
+
+
         
 
         
         Keyboard.Listen(Key.Escape, ButtonState.Pressed, ConfirmExit, "Lopeta peli");
         Mouse.Listen(MouseButton.Left, ButtonState.Down, AmmuAseella, "Lopeta peli", torni);
+        
     }
     
     void luokenttä()
@@ -110,8 +116,15 @@ public class Laserpelin_paluu : PhysicsGame
 
         torni.Add(piippu);
 
-        seinä = new PhysicsObject(450, 100);
-        seinä2 = new PhysicsObject(450, 100);
+        LuoSeinat();
+        
+
+    }
+
+    void LuoSeinat()
+    {
+        seinä = new PhysicsObject(475, 100);
+        seinä2 = new PhysicsObject(475, 100);
         seinä.X = (-225);
         seinä.Y = (0);
         seinä.Image = seinäkuva;
@@ -122,14 +135,13 @@ public class Laserpelin_paluu : PhysicsGame
         seinä2.Y = (0);
         seinä2.Image = seinäkuva;
         Add(seinä2);
-
     }
 
     private void luopahis()
     {
         pistelaskuri.AddValue(1);
         
-        if (RandomGen.NextInt(1, 7) == 1)
+        if (RandomGen.NextInt(1, 10) == 1)
         {
             Juusto();
         }
@@ -152,6 +164,17 @@ public class Laserpelin_paluu : PhysicsGame
         }
         if (pistelaskuri == 30)
         {
+            bossi();
+            bossi();
+        }
+        if (pistelaskuri == 35)
+        {
+            bossi();
+            bossi();
+        }
+        if (pistelaskuri == 40)
+        {
+            bossi();
             bossi();
         }
 
@@ -195,6 +218,7 @@ public class Laserpelin_paluu : PhysicsGame
     {
         Mouse.ListenMovement(0.1, Tahtaa, "Tähtää aseella");
         Gravity = new Vector(0.0, -1000.0);
+        
     }
     void AmmusOsui(PhysicsObject ammus, PhysicsObject kohde)
     {
@@ -296,6 +320,8 @@ public class Laserpelin_paluu : PhysicsGame
 
     void bossi()
     {
+        Juusto();
+
         int luku = RandomGen.NextInt(1, 5);
         if (luku == 1)
         {
@@ -312,11 +338,8 @@ public class Laserpelin_paluu : PhysicsGame
         }
         if (luku == 3)
         {
-            for (int i = 0; i < 3; i++)
-            {
-                Juusto();
-            }
-            
+            MegaNacho();
+
         }
         if (luku == 4)
         {
@@ -339,10 +362,24 @@ public class Laserpelin_paluu : PhysicsGame
         juusto.IgnoresCollisionResponse = true;
         Add(juusto);
     }
+    void MegaNacho()
+    {
+        mega = new PhysicsObject(75, 75);
+        mega.Shape = Shape.Circle;
+        mega.Image = megakuva;
+        mega.Y = (400.0);
+        mega.Mass = 30;
+        mega.Tag = "tuho";
+        //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
+        mega.IgnoresGravity = false;
+        mega.X = (RandomGen.NextDouble(-400, 400));
+        mega.IgnoresCollisionResponse = false;
+        Add(mega);
+    }
     void Taffel()
     {
         FollowerBrain seuraajanAivot = new FollowerBrain(torni);
-        seuraajanAivot.Speed = 40;
+        seuraajanAivot.Speed = 10;
         seuraajanAivot.DistanceFar = 100000; 
         seuraajanAivot.DistanceClose = 100;
         seuraajanAivot.StopWhenTargetClose = true;
@@ -352,21 +389,70 @@ public class Laserpelin_paluu : PhysicsGame
         soikio.Shape = Shape.Circle;
         soikio.Image = soikiokuva;
         soikio.Y = (-400.0);
-        soikio.Mass = 1;
+        soikio.Mass = 2;
         //pahis.Velocity = new Vector(-pahis.X, 300-pahis.Y);
         soikio.IgnoresGravity = false;
         soikio.X = (RandomGen.NextDouble(-400, 400));
         Add(soikio);
         soikio.Brain = seuraajanAivot;
         soikio.Brain.Active = true;
-        soikio.AngularVelocity = 20;
+        soikio.AngularVelocity = 40;
         AddCollisionHandler(soikio, TaffelTormaa);
     }
 
     void TaffelTormaa(PhysicsObject tormaaja, PhysicsObject kohde)
     {
         
-        tormaaja.AngularVelocity = 20;
+        tormaaja.AngularVelocity = 30;
+    }
+
+    void kaaos()
+    {
+        alkaa();
+        Timer kaaost = new Timer();
+        kaaost.Interval = 1;
+        kaaost.Timeout += kaaostapahtuu;
+        kaaost.Start();
+    }
+
+    void kaaostapahtuu()
+    {
+        
+        if (RandomGen.NextInt(1,3)==1)
+        {
+            Gravity = new Vector(0.0, RandomGen.NextInt(-2000, 0));
+        }
+        if (RandomGen.NextInt(1,3)==1)
+        {
+            Gravity = new Vector(0.0, 0.0);
+        }
+        if (RandomGen.NextInt(1,4)==1)
+        {
+            bossi();
+        }
+        if (RandomGen.NextInt(1,3)==1)
+        {
+            torni.FireRate = RandomGen.NextDouble(1,20);
+        }
+        if (RandomGen.NextInt(1,10)==1)
+        {
+            LuoSeinat();
+        }
+        if (RandomGen.NextInt(1,7)==1)
+        {
+            seinä.Destroy();
+        }
+        if (RandomGen.NextInt(1,7)==1)
+        {
+            seinä2.Destroy();
+        }
+        if (RandomGen.NextInt(1,10)==1)
+        {
+            for (int i = 0; i < RandomGen.NextInt(1, 10); i++)
+            {
+                Juusto();
+            }
+        }
     }
 
 }
